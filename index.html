@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMAN1POIGARconfess - Q&A Anonymous</title>
+    <meta name="description" content="Platform Q&A Anonymous untuk siswa SMAN 1 POIGAR. Berbagi cerita dan bertanya secara anonim dengan aman.">
+    <meta name="keywords" content="SMAN1POIGAR, confession, anonymous, Q&A, siswa, sekolah">
+    <meta name="author" content="SMAN 1 POIGAR">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="SMAN1POIGARconfess - Q&A Anonymous">
+    <meta property="og:description" content="Platform Q&A Anonymous untuk siswa SMAN 1 POIGAR">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourusername.github.io/sman1poigar-confess">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-shadow { box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .confession-card { transition: all 0.3s ease; }
+        .confession-card:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
+        .typing-animation { animation: typing 2s infinite; }
+        @keyframes typing {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                        <span class="text-purple-600 font-bold text-lg">S</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">SMAN1POIGARconfess</h1>
+                        <p class="text-purple-100 text-sm">Platform Q&A Anonymous SMAN 1 POIGAR</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="showTab('home')" id="homeBtn" class="px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-all">
+                        🏠 Beranda
+                    </button>
+                    <button onclick="showTab('submit')" id="submitBtn" class="px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-all">
+                        ✍️ Kirim
+                    </button>
+                    <button onclick="showTab('admin')" id="adminBtn" class="px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-all">
+                        ⚙️ Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Home Tab -->
+        <div id="homeTab" class="tab-content">
+            <!-- Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-xl p-6 card-shadow text-center">
+                    <div class="text-3xl font-bold text-purple-600" id="totalConfessions">0</div>
+                    <div class="text-gray-600 mt-2">Total Confessions</div>
+                </div>
+                <div class="bg-white rounded-xl p-6 card-shadow text-center">
+                    <div class="text-3xl font-bold text-green-600" id="totalAnswered">0</div>
+                    <div class="text-gray-600 mt-2">Sudah Dijawab</div>
+                </div>
+                <div class="bg-white rounded-xl p-6 card-shadow text-center">
+                    <div class="text-3xl font-bold text-orange-600" id="totalPending">0</div>
+                    <div class="text-gray-600 mt-2">Menunggu Jawaban</div>
+                </div>
+            </div>
+
+            <!-- Filter -->
+            <div class="bg-white rounded-xl p-6 card-shadow mb-6">
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div class="flex items-center space-x-2">
+                        <label class="text-gray-700 font-medium">Filter:</label>
+                        <select id="filterStatus" onchange="filterConfessions()" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="all">Semua Dijawab</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <label class="text-gray-700 font-medium">Kategori:</label>
+                        <select id="filterCategory" onchange="filterConfessions()" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="all">Semua Kategori</option>
+                            <option value="akademik">Akademik</option>
+                            <option value="sosial">Sosial</option>
+                            <option value="pribadi">Pribadi</option>
+                            <option value="karir">Karir</option>
+                            <option value="lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Cari confession..." onkeyup="filterConfessions()" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent flex-1 min-w-64">
+                </div>
+            </div>
+
+            <!-- Confessions List -->
+            <div id="confessionsList" class="space-y-6">
+                <!-- Confessions will be loaded here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="text-center py-12 hidden">
+                <div class="text-6xl mb-4">💭</div>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">Belum ada confession</h3>
+                <p class="text-gray-500 mb-6">Jadilah yang pertama untuk berbagi cerita atau bertanya!</p>
+                <button onclick="showTab('submit')" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                    Kirim Confession Pertama
+                </button>
+            </div>
+        </div>
+
+        <!-- Submit Tab -->
+        <div id="submitTab" class="tab-content hidden">
+            <div class="max-w-2xl mx-auto">
+                <div class="bg-white rounded-xl p-8 card-shadow">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Kirim Confession Anonymous</h2>
+                        <p class="text-gray-600">Ceritakan apa yang ada di pikiranmu. Identitasmu akan tetap aman! 🤫</p>
+                    </div>
+
+                    <form id="confessionForm" class="space-y-6">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Kategori</label>
+                            <select id="category" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <option value="">Pilih kategori...</option>
+                                <option value="akademik">📚 Akademik</option>
+                                <option value="sosial">👥 Sosial</option>
+                                <option value="pribadi">💭 Pribadi</option>
+                                <option value="karir">🎯 Karir</option>
+                                <option value="lainnya">🌟 Lainnya</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Judul/Topik</label>
+                            <input type="text" id="title" required maxlength="100" placeholder="Berikan judul singkat untuk confession-mu..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <div class="text-right text-sm text-gray-500 mt-1">
+                                <span id="titleCount">0</span>/100
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Confession/Pertanyaan</label>
+                            <textarea id="content" required maxlength="1000" rows="6" placeholder="Tulis confession atau pertanyaanmu di sini... Jangan khawatir, ini anonymous!" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"></textarea>
+                            <div class="text-right text-sm text-gray-500 mt-1">
+                                <span id="contentCount">0</span>/1000
+                            </div>
+                        </div>
+
+                        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                            <div class="flex items-start space-x-3">
+                                <div class="text-purple-600 text-xl">🔒</div>
+                                <div>
+                                    <h4 class="font-medium text-purple-800">Jaminan Privasi</h4>
+                                    <p class="text-purple-700 text-sm mt-1">Confession-mu akan ditampilkan secara anonymous. Tidak ada yang bisa melacak identitasmu!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-lg">
+                            🚀 Kirim Confession
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Tab -->
+        <div id="adminTab" class="tab-content hidden">
+            <div class="bg-white rounded-xl p-6 card-shadow mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Panel Admin</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button onclick="showPendingConfessions()" class="p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors text-left">
+                        <div class="font-medium text-orange-800">Confession Pending</div>
+                        <div class="text-orange-600 text-sm">Kelola confession yang belum dijawab</div>
+                    </button>
+                    <button onclick="showAllConfessions()" class="p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors text-left">
+                        <div class="font-medium text-blue-800">Semua Confession</div>
+                        <div class="text-blue-600 text-sm">Lihat dan kelola semua confession</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- GitHub Deployment Status -->
+            <div class="bg-green-50 border border-green-200 rounded-xl p-6 card-shadow mb-6" id="deploymentStatus">
+                <h3 class="text-lg font-bold text-green-800 mb-4">🚀 Status Deployment</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-green-600 text-xl">✅</span>
+                        <div>
+                            <div class="font-medium text-green-800">Website Aktif</div>
+                            <div class="text-green-600 text-sm" id="siteUrl">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-green-600 text-xl">🔐</span>
+                        <div>
+                            <div class="font-medium text-green-800">Admin Panel</div>
+                            <div class="text-green-600 text-sm" id="adminUrl">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg p-3">
+                        <div class="text-sm text-gray-700">
+                            <strong>Password Admin:</strong> <code class="bg-gray-100 px-2 py-1 rounded">ANONIM007</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="adminConfessionsList" class="space-y-4">
+                <!-- Admin confessions will be loaded here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl max-w-md w-full">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">🔐 Admin Login</h3>
+                    <button onclick="closeAdminLoginModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                
+                <form id="adminLoginForm" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Password Admin</label>
+                        <input type="password" id="adminPassword" required placeholder="Masukkan password admin..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                    
+                    <div id="loginError" class="hidden bg-red-50 border border-red-200 rounded-lg p-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-red-600">❌</span>
+                            <span class="text-red-700 text-sm">Password salah! Silakan coba lagi.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button type="submit" class="flex-1 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium">
+                            🚀 Login
+                        </button>
+                        <button type="button" onclick="closeAdminLoginModal()" class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                    <div class="flex items-start space-x-3">
+                        <div class="text-purple-600 text-lg">🔒</div>
+                        <div>
+                            <h4 class="font-medium text-purple-800 text-sm">Akses Admin</h4>
+                            <p class="text-purple-700 text-xs mt-1">Hanya admin yang memiliki password yang dapat mengakses panel admin untuk mengelola confession.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for answering confessions -->
+    <div id="answerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl max-w-2xl w-full max-h-90vh overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-800">Jawab Confession</h3>
+                    <button onclick="closeAnswerModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                
+                <div id="modalConfessionContent" class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <!-- Confession content will be loaded here -->
+                </div>
+
+                <form id="answerForm">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2">Jawaban</label>
+                        <textarea id="answerContent" required rows="6" placeholder="Tulis jawaban yang membantu dan bijaksana..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"></textarea>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button type="submit" class="flex-1 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                            ✅ Kirim Jawaban
+                        </button>
+                        <button type="button" onclick="closeAnswerModal()" class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="fixed top-4 right-4 z-50"></div>
+
+    <script>
+        // Data storage
+        let confessions = JSON.parse(localStorage.getItem('sman1poigarConfessions') || '[]');
+        let currentTab = 'home';
+        let currentAnsweringId = null;
+        let isAdminMode = false;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSampleData();
+            checkURLAndSetMode();
+            setupEventListeners();
+            updateDeploymentStatus();
+        });
+
+        // Update deployment status
+        function updateDeploymentStatus() {
+            const siteUrlElement = document.getElementById('siteUrl');
+            const adminUrlElement = document.getElementById('adminUrl');
+            
+            if (siteUrlElement && adminUrlElement) {
+                const baseUrl = window.location.origin + window.location.pathname;
+                siteUrlElement.textContent = baseUrl;
+                adminUrlElement.textContent = baseUrl + '?mode=admin';
+            }
+        }
+
+        // Check URL and set appropriate mode
+        function checkURLAndSetMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+            
+            if (mode === 'admin') {
+                isAdminMode = true;
+                document.body.classList.add('admin-mode');
+                showAdminInterface();
+            } else {
+                isAdminMode = false;
+                document.body.classList.remove('admin-mode');
+                showPublicInterface();
+            }
+        }
+
+        // Show admin interface
+        function showAdminInterface() {
+            // Hide public navigation buttons
+            document.getElementById('homeBtn').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'none';
+            
+            // Update header
+            document.querySelector('header h1').textContent = 'SMAN1POIGAR Admin Panel';
+            document.querySelector('header p').textContent = 'Panel Admin untuk mengelola confession';
+            
+            // Add public site link and URL info
+            const headerButtons = document.querySelector('header .flex.space-x-2');
+            headerButtons.innerHTML = `
+                <a href="?" class="px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-all">
+                    🌐 Ke Situs Publik
+                </a>
+                <button onclick="showTab('admin')" id="adminBtn" class="px-4 py-2 bg-white bg-opacity-30 rounded-lg">
+                    ⚙️ Dashboard Admin
+                </button>
+            `;
+            
+            showTab('admin');
+        }
+
+        // Show public interface
+        function showPublicInterface() {
+            // Show public navigation buttons
+            document.getElementById('homeBtn').style.display = 'inline-block';
+            document.getElementById('submitBtn').style.display = 'inline-block';
+            
+            // Update header
+            document.querySelector('header h1').textContent = 'SMAN1POIGARconfess';
+            document.querySelector('header p').textContent = 'Platform Q&A Anonymous SMAN 1 POIGAR';
+            
+            // Reset header buttons to original state
+            const headerButtons = document.querySelector('header .flex.space-x-2');
+            headerButtons.innerHTML = `
+                <button onclick="showTab('home')" id="homeBtn" class="px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-all">
+                    🏠 Beranda
+                </button>
+                <button onclick="showTab('submit')" id="submitBtn" class="px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-all">
+                    ✍️ Kirim
+                </button>
+                <button onclick="showAdminLoginModal()" id="adminBtn" class="px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-all">
+                    🔐 Admin Login
+                </button>
+            `;
+            
+            showTab('home');
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Character counters
+            document.getElementById('title').addEventListener('input', function() {
+                document.getElementById('titleCount').textContent = this.value.length;
+            });
+
+            document.getElementById('content').addEventListener('input', function() {
+                document.getElementById('contentCount').textContent = this.value.length;
+            });
+
+            // Form submission
+            document.getElementById('confessionForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitConfession();
+            });
+
+            document.getElementById('answerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitAnswer();
+            });
+
+            document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleAdminLogin();
+            });
+
+            // Add keyboard event listeners
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    // Close admin login modal if open
+                    if (!document.getElementById('adminLoginModal').classList.contains('hidden')) {
+                        closeAdminLoginModal();
+                    }
+                    // Close answer modal if open
+                    if (!document.getElementById('answerModal').classList.contains('hidden')) {
+                        closeAnswerModal();
+                    }
+                }
+            });
+        }
+
+        // Load sample data if empty
+        function loadSampleData() {
+            if (confessions.length === 0) {
+                confessions = [
+                    {
+                        id: 1,
+                        title: "Susah fokus belajar online",
+                        content: "Guys, aku susah banget fokus kalau belajar online. Ada tips nggak biar bisa lebih konsentrasi? Nilai-nilaiku mulai turun nih 😭",
+                        category: "akademik",
+                        timestamp: new Date(Date.now() - 86400000).toISOString(),
+                        status: "answered",
+                        answer: "Coba buat jadwal belajar yang teratur dan cari tempat yang tenang. Matikan notifikasi HP saat belajar, dan jangan lupa istirahat setiap 25 menit (teknik Pomodoro). Kamu juga bisa belajar bareng teman via video call biar lebih semangat!",
+                        answerTimestamp: new Date(Date.now() - 43200000).toISOString()
+                    },
+                    {
+                        id: 2,
+                        title: "Minder sama teman-teman",
+                        content: "Aku sering merasa minder sama teman-teman yang lebih pinter dan lebih aktif di kelas. Gimana ya cara biar lebih percaya diri?",
+                        category: "pribadi",
+                        timestamp: new Date(Date.now() - 172800000).toISOString(),
+                        status: "answered",
+                        answer: "Ingat bahwa setiap orang punya kelebihan masing-masing! Fokus pada kekuatanmu sendiri dan jangan membandingkan diri dengan orang lain. Coba ikut kegiatan yang kamu suka, dan ingat bahwa kepercayaan diri itu dibangun dari pencapaian kecil sehari-hari. Kamu pasti bisa! 💪",
+                        answerTimestamp: new Date(Date.now() - 86400000).toISOString()
+                    },
+                    {
+                        id: 3,
+                        title: "Bingung pilih jurusan kuliah",
+                        content: "Sebentar lagi kelas 12, tapi aku masih bingung mau ambil jurusan apa di kuliah. Orang tua pengen aku jadi dokter, tapi aku lebih suka seni. Gimana dong?",
+                        category: "karir",
+                        timestamp: new Date(Date.now() - 259200000).toISOString(),
+                        status: "pending"
+                    }
+                ];
+                saveConfessions();
+            }
+        }
+
+        // Tab management
+        function showTab(tabName) {
+            // Prevent access to admin tab in public mode
+            if (tabName === 'admin' && !isAdminMode) {
+                return;
+            }
+
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+
+            // Remove active state from all buttons
+            document.querySelectorAll('header button').forEach(btn => {
+                btn.classList.remove('bg-white', 'bg-opacity-30');
+                btn.classList.add('bg-opacity-20');
+            });
+
+            // Show selected tab
+            const tabElement = document.getElementById(tabName + 'Tab');
+            if (tabElement) {
+                tabElement.classList.remove('hidden');
+            }
+            
+            const tabBtn = document.getElementById(tabName + 'Btn');
+            if (tabBtn) {
+                tabBtn.classList.remove('bg-opacity-20');
+                tabBtn.classList.add('bg-opacity-30');
+            }
+
+            currentTab = tabName;
+
+            // Load content based on tab
+            if (tabName === 'home') {
+                loadConfessions();
+                updateStats();
+            } else if (tabName === 'admin') {
+                loadAdminConfessions();
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = confessions.length;
+            const answered = confessions.filter(c => c.status === 'answered').length;
+            const pending = confessions.filter(c => c.status === 'pending').length;
+
+            document.getElementById('totalConfessions').textContent = total;
+            document.getElementById('totalAnswered').textContent = answered;
+            document.getElementById('totalPending').textContent = pending;
+        }
+
+        // Load confessions for home page
+        function loadConfessions() {
+            const container = document.getElementById('confessionsList');
+            const emptyState = document.getElementById('emptyState');
+
+            // Only show answered confessions to public
+            const answeredConfessions = confessions.filter(c => c.status === 'answered');
+
+            if (answeredConfessions.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            
+            let filteredConfessions = [...answeredConfessions].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            container.innerHTML = filteredConfessions.map(confession => `
+                <div class="confession-card bg-white rounded-xl p-6 card-shadow">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                                <span class="text-purple-600 font-bold">${getCategoryIcon(confession.category)}</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">${confession.title}</h3>
+                                <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                    <span>${getCategoryName(confession.category)}</span>
+                                    <span>•</span>
+                                    <span>${formatDate(confession.timestamp)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium ${confession.status === 'answered' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}">
+                            ${confession.status === 'answered' ? '✅ Dijawab' : '⏳ Pending'}
+                        </span>
+                    </div>
+                    
+                    <p class="text-gray-700 mb-4 leading-relaxed">${confession.content}</p>
+                    
+                    ${confession.status === 'answered' ? `
+                        <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                            <div class="flex items-center mb-2">
+                                <span class="text-green-600 font-medium">💡 Jawaban:</span>
+                                <span class="text-sm text-green-600 ml-auto">${formatDate(confession.answerTimestamp)}</span>
+                            </div>
+                            <p class="text-green-800 leading-relaxed">${confession.answer}</p>
+                        </div>
+                    ` : `
+                        <div class="bg-orange-50 border-l-4 border-orange-400 p-4 rounded-r-lg">
+                            <div class="flex items-center">
+                                <span class="text-orange-600 font-medium typing-animation">💭 Menunggu jawaban...</span>
+                            </div>
+                        </div>
+                    `}
+                </div>
+            `).join('');
+        }
+
+        // Filter confessions
+        function filterConfessions() {
+            const statusFilter = document.getElementById('filterStatus').value;
+            const categoryFilter = document.getElementById('filterCategory').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            // Only show answered confessions to public
+            const answeredConfessions = confessions.filter(c => c.status === 'answered');
+
+            let filtered = answeredConfessions.filter(confession => {
+                const matchesStatus = statusFilter === 'all' || confession.status === statusFilter;
+                const matchesCategory = categoryFilter === 'all' || confession.category === categoryFilter;
+                const matchesSearch = confession.title.toLowerCase().includes(searchTerm) || 
+                                    confession.content.toLowerCase().includes(searchTerm);
+                
+                return matchesStatus && matchesCategory && matchesSearch;
+            });
+
+            const container = document.getElementById('confessionsList');
+            const emptyState = document.getElementById('emptyState');
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            
+            filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            container.innerHTML = filtered.map(confession => `
+                <div class="confession-card bg-white rounded-xl p-6 card-shadow">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                                <span class="text-purple-600 font-bold">${getCategoryIcon(confession.category)}</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">${confession.title}</h3>
+                                <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                    <span>${getCategoryName(confession.category)}</span>
+                                    <span>•</span>
+                                    <span>${formatDate(confession.timestamp)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium ${confession.status === 'answered' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}">
+                            ${confession.status === 'answered' ? '✅ Dijawab' : '⏳ Pending'}
+                        </span>
+                    </div>
+                    
+                    <p class="text-gray-700 mb-4 leading-relaxed">${confession.content}</p>
+                    
+                    ${confession.status === 'answered' ? `
+                        <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                            <div class="flex items-center mb-2">
+                                <span class="text-green-600 font-medium">💡 Jawaban:</span>
+                                <span class="text-sm text-green-600 ml-auto">${formatDate(confession.answerTimestamp)}</span>
+                            </div>
+                            <p class="text-green-800 leading-relaxed">${confession.answer}</p>
+                        </div>
+                    ` : `
+                        <div class="bg-orange-50 border-l-4 border-orange-400 p-4 rounded-r-lg">
+                            <div class="flex items-center">
+                                <span class="text-orange-600 font-medium typing-animation">💭 Menunggu jawaban...</span>
+                            </div>
+                        </div>
+                    `}
+                </div>
+            `).join('');
+        }
+
+        // Submit confession
+        function submitConfession() {
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const category = document.getElementById('category').value;
+
+            const newConfession = {
+                id: Date.now(),
+                title: title,
+                content: content,
+                category: category,
+                timestamp: new Date().toISOString(),
+                status: 'pending'
+            };
+
+            confessions.unshift(newConfession);
+            saveConfessions();
+
+            // Reset form
+            document.getElementById('confessionForm').reset();
+            document.getElementById('titleCount').textContent = '0';
+            document.getElementById('contentCount').textContent = '0';
+
+            showMessage('Confession berhasil dikirim! 🎉', 'success');
+            showTab('home');
+        }
+
+        // Load admin confessions
+        function loadAdminConfessions() {
+            showAllConfessions();
+        }
+
+        function showPendingConfessions() {
+            const pending = confessions.filter(c => c.status === 'pending');
+            renderAdminConfessions(pending, 'Confession Pending');
+        }
+
+        function showAllConfessions() {
+            renderAdminConfessions(confessions, 'Semua Confession');
+        }
+
+        function renderAdminConfessions(confessionList, title) {
+            const container = document.getElementById('adminConfessionsList');
+            
+            if (confessionList.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="text-4xl mb-4">📝</div>
+                        <h3 class="text-lg font-semibold text-gray-700">Tidak ada confession</h3>
+                    </div>
+                `;
+                return;
+            }
+
+            const sortedConfessions = [...confessionList].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            container.innerHTML = `
+                <h3 class="text-lg font-bold text-gray-800 mb-4">${title} (${confessionList.length})</h3>
+                ${sortedConfessions.map(confession => `
+                    <div class="bg-white rounded-lg p-4 card-shadow">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-lg">${getCategoryIcon(confession.category)}</span>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">${confession.title}</h4>
+                                    <div class="text-sm text-gray-500">${getCategoryName(confession.category)} • ${formatDate(confession.timestamp)}</div>
+                                </div>
+                            </div>
+                            <span class="px-2 py-1 rounded text-xs font-medium ${confession.status === 'answered' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}">
+                                ${confession.status === 'answered' ? 'Dijawab' : 'Pending'}
+                            </span>
+                        </div>
+                        
+                        <p class="text-gray-700 mb-3 text-sm">${confession.content}</p>
+                        
+                        ${confession.status === 'answered' ? `
+                            <div class="bg-green-50 p-3 rounded-lg mb-3">
+                                <div class="text-sm text-green-600 font-medium mb-1">Jawaban:</div>
+                                <p class="text-green-800 text-sm">${confession.answer}</p>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="flex space-x-2">
+                            ${confession.status === 'pending' ? `
+                                <button onclick="openAnswerModal(${confession.id})" class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors">
+                                    ✍️ Jawab
+                                </button>
+                            ` : `
+                                <button onclick="openAnswerModal(${confession.id})" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors">
+                                    ✏️ Edit Jawaban
+                                </button>
+                            `}
+                            <button onclick="deleteConfession(${confession.id})" class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition-colors">
+                                🗑️ Hapus
+                            </button>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        // Answer modal functions
+        function openAnswerModal(confessionId) {
+            const confession = confessions.find(c => c.id === confessionId);
+            if (!confession) return;
+
+            currentAnsweringId = confessionId;
+            
+            document.getElementById('modalConfessionContent').innerHTML = `
+                <div class="flex items-center space-x-2 mb-2">
+                    <span class="text-lg">${getCategoryIcon(confession.category)}</span>
+                    <h4 class="font-medium text-gray-800">${confession.title}</h4>
+                </div>
+                <p class="text-gray-700">${confession.content}</p>
+            `;
+
+            document.getElementById('answerContent').value = confession.answer || '';
+            document.getElementById('answerModal').classList.remove('hidden');
+            document.getElementById('answerModal').classList.add('flex');
+        }
+
+        function closeAnswerModal() {
+            document.getElementById('answerModal').classList.add('hidden');
+            document.getElementById('answerModal').classList.remove('flex');
+            currentAnsweringId = null;
+            document.getElementById('answerContent').value = '';
+        }
+
+        function submitAnswer() {
+            if (!currentAnsweringId) return;
+
+            const answer = document.getElementById('answerContent').value;
+            const confessionIndex = confessions.findIndex(c => c.id === currentAnsweringId);
+            
+            if (confessionIndex !== -1) {
+                confessions[confessionIndex].answer = answer;
+                confessions[confessionIndex].status = 'answered';
+                confessions[confessionIndex].answerTimestamp = new Date().toISOString();
+                
+                saveConfessions();
+                closeAnswerModal();
+                loadAdminConfessions();
+                showMessage('Jawaban berhasil disimpan! ✅', 'success');
+            }
+        }
+
+        // Delete confession
+        function deleteConfession(confessionId) {
+            if (confirm('Yakin ingin menghapus confession ini?')) {
+                confessions = confessions.filter(c => c.id !== confessionId);
+                saveConfessions();
+                loadAdminConfessions();
+                showMessage('Confession berhasil dihapus! 🗑️', 'success');
+            }
+        }
+
+        // Utility functions
+        function getCategoryIcon(category) {
+            const icons = {
+                'akademik': '📚',
+                'sosial': '👥',
+                'pribadi': '💭',
+                'karir': '🎯',
+                'lainnya': '🌟'
+            };
+            return icons[category] || '🌟';
+        }
+
+        function getCategoryName(category) {
+            const names = {
+                'akademik': 'Akademik',
+                'sosial': 'Sosial',
+                'pribadi': 'Pribadi',
+                'karir': 'Karir',
+                'lainnya': 'Lainnya'
+            };
+            return names[category] || 'Lainnya';
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 1) return 'Hari ini';
+            if (diffDays === 2) return 'Kemarin';
+            if (diffDays <= 7) return `${diffDays - 1} hari lalu`;
+            
+            return date.toLocaleDateString('id-ID', { 
+                day: 'numeric', 
+                month: 'short', 
+                year: 'numeric' 
+            });
+        }
+
+        function saveConfessions() {
+            localStorage.setItem('sman1poigarConfessions', JSON.stringify(confessions));
+        }
+
+        // Admin login modal functions
+        function showAdminLoginModal() {
+            document.getElementById('adminLoginModal').classList.remove('hidden');
+            document.getElementById('adminLoginModal').classList.add('flex');
+            setTimeout(() => {
+                document.getElementById('adminPassword').focus();
+            }, 100);
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        function closeAdminLoginModal() {
+            document.getElementById('adminLoginModal').classList.add('hidden');
+            document.getElementById('adminLoginModal').classList.remove('flex');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        function handleAdminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (password === 'ANONIM007') {
+                closeAdminLoginModal();
+                showMessage('Login berhasil! Mengalihkan ke panel admin... 🎉', 'success');
+                setTimeout(() => {
+                    window.location.href = '?mode=admin';
+                }, 1000);
+            } else {
+                errorDiv.classList.remove('hidden');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
+                
+                // Auto hide error after 3 seconds
+                setTimeout(() => {
+                    errorDiv.classList.add('hidden');
+                }, 3000);
+            }
+        }
+
+        function showMessage(message, type) {
+            const container = document.getElementById('messageContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `p-4 rounded-lg shadow-lg mb-2 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+            messageDiv.textContent = message;
+            
+            container.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96a57d27637a40a6',t:'MTc1NDM4ODQ2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
